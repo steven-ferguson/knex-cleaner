@@ -6,7 +6,6 @@ module.exports = {
 
     return knexObject.raw('show tables').then(function(tables) {
       var tableNamesToClean = _this._getTablesToClean(tables[0]);
-
       return Promise.map(tableNamesToClean, function(tableName) {
         return _this.cleanTableWithDeletion(knexObject, tableName);
       });
@@ -18,9 +17,16 @@ module.exports = {
   },
 
   _getTablesToClean: function(tables) {
-    return tables.filter(function(table) {
+    var tableNames = []
+
+    tables.forEach(function(table) {
       var tableName = table[Object.keys(table)[0]];
-      return tableName !== 'DATABASECHANGELOG' && tableName !== 'DATABASECHANGELOGLOCK';
+
+      if (tableName !== 'DATABASECHANGELOG' && tableName !== 'DATABASECHANGELOGLOCK') {
+        return tableNames.push(tableName);
+      };
     });
+
+    return tableNames;
   }
 }
