@@ -1,6 +1,11 @@
 # knex-cleaner
 Helper function to clean a MySQL database with knex
 
+###Installation
+```
+npm install knex-cleaner
+```
+
 ###Usage
 ```javascript
 var knexCleaner = require('knex-cleaner');
