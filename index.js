@@ -8,7 +8,7 @@ module.exports = {
       var tableNamesToClean = _this._getTablesToClean(tables[0]);
 
       return Promise.map(tableNamesToClean, function(tableName) {
-        return cleanTableWithDeletion(knexObject, tableName);
+        return _this.cleanTableWithDeletion(knexObject, tableName);
       });
     });
   },
