@@ -7,7 +7,7 @@ module.exports = {
     return knexObject.raw('show tables').then(function(tables) {
       var tableNamesToClean = _this._getTablesToClean(tables[0]);
 
-      return Promise.map(tablesToClean, function(tableName) {
+      return Promise.map(tableNamesToClean, function(tableName) {
         return cleanTableWithDeletion(knexObject, tableName);
       });
     });
