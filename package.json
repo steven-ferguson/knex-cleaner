@@ -1,0 +1,24 @@
+{
+  "name": "knex-cleaner",
+  "version": "0.0.1",
+  "description": "Database cleaner for Knex.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/steven-ferguson/knex-cleaner.git"
+  },
+  "keywords": [
+    "knex"
+  ],
+  "author": "Steven Ferguson <steven.ferguson11@gmail.com>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/steven-ferguson/knex-cleaner/issues"
+  },
+  "dependencies": {
+    "bluebird": "^2.9.13"
+  }
+}
