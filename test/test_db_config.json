@@ -1,0 +1,26 @@
+{
+  "mysql": {
+    "client": "mysql",
+    "connection": {
+      "host": "127.0.0.1",
+      "user": "knex_cleaner",
+      "password": "password",
+      "database": "knex_cleaner_test"
+    }
+  },
+  "pg": {
+    "client": "pg",
+    "connection": {
+      "host": "127.0.0.1",
+      "user": "knex_cleaner",
+      "password": "password",
+      "database": "knex_cleaner_test"
+    }
+  },
+  "sqlite3": {
+    "client": "sqlite3",
+    "connection": {
+      "filename": "./knex_clean_test.sqlite"
+    }
+  }
+}
