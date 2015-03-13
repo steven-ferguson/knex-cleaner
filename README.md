@@ -1,5 +1,5 @@
 # knex-cleaner
-Helper function to clean a MySQL database with knex
+Helper library to clean a PostgreSQL, MySQL or SQLite3 database tables using Knex. Great for integration tests.
 
 ###Installation
 ```
@@ -24,10 +24,23 @@ knexCleaner.clean(knex).then(function() {
   // your database is now clean
 });
 
-// OR WITH A BOOKSHELF instance
+// You can also use this in BookshelfJS
 var bookshelf = require('bookshelf')(knex);
 
 knexCleaner.clean(bookshelf.knex).then(function() {
 
 });
+
+// You can also pass if it deletes the tables with delete instead of truncate
+// as well as a list of tables to ignore.
+
+var options = {
+  mode: 'delete', // Valid options 'truncate', 'delete'
+  ignoreTables: ['Dont_Del_1', 'Dont_Del_2']
+}
+
+knexCleaner.clean(knex, options).then(function() {
+  // your database is now clean
+});
 ```
+The example above used MySQL but it has been tested on PostgreSQL and SQLite3.

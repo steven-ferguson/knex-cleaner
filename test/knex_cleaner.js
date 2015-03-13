@@ -1,6 +1,7 @@
 'use strict';
 
 var Promise = require('bluebird');
+var Faker = require('faker');
 var chai = require("chai");
 var chaiAsPromised = require("chai-as-promised");
 
@@ -11,6 +12,7 @@ var knexMySQL = require('./knex_test')('mysql');
 var knexPG = require('./knex_test')('pg');
 var knexSqLite3 = require('./knex_test')('pg');
 var knexCleaner = require('../lib/knex_cleaner');
+var knexTables = require('../lib/knex_tables');
 
 describe('knex_cleaner', function() {
 
@@ -32,7 +34,16 @@ describe('knex_cleaner', function() {
             table.string('name');
             table.timestamps();
           })
-        ]);
+        ]).then(function() {
+          return Promise.all([
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_2').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_2').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_2').insert({name: Faker.company.companyName()})
+          ])
+        });
       });
 
       afterEach(function() {
@@ -42,22 +53,46 @@ describe('knex_cleaner', function() {
         ]);
       });
 
-      it('can clear all tables with defaults', function(done) {
-        return knexCleaner.clean(dbTestValues.knex);
-      });
-      /*
-      it('can clear all tables with delete', function(done) {
-        return knexCleaner.clean(dbTestValues.knex, {
-          mode: 'delete'
+      it('can clear all tables with defaults', function() {
+        return knexCleaner.clean(dbTestValues.knex)
+        .then(function() {
+          return Promise.all([
+            knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+              .should.eventually.equal(0),
+            knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+              .should.eventually.equal(0)
+          ]);
         });
       });
 
-      it('can clear all tables ignoring tables', function(done) {
+      it('can clear all tables with delete', function() {
         return knexCleaner.clean(dbTestValues.knex, {
-          ignoreTables: ['test_1']
+          mode: 'delete'
+        })
+        .then(function() {
+          return Promise.all([
+            knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+            .should.eventually.equal(0),
+            knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+            .should.eventually.equal(0)
+          ]);
         });
       });
-      */
+
+      it('can clear all tables ignoring tables', function() {
+        return knexCleaner.clean(dbTestValues.knex, {
+          ignoreTables: ['test_1']
+        })
+        .then(function() {
+          return Promise.all([
+            knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+            .should.eventually.equal(3),
+            knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+            .should.eventually.equal(0)
+          ]);
+        });
+      });
+
     });
 
   });
