@@ -19,7 +19,7 @@ describe('knex_tables', function() {
   .forEach(function(dbTestValues) {
 
     describe(dbTestValues.client, function() {
-      
+
       beforeEach(function() {
         return Promise.all([
           dbTestValues.knex.schema.createTable('test_1', function (table) {
@@ -36,10 +36,7 @@ describe('knex_tables', function() {
       });
 
       afterEach(function() {
-        return Promise.all([
-          dbTestValues.knex.schema.dropTable('test_1'),
-          dbTestValues.knex.schema.dropTable('test_2')
-        ]);
+        return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
       });
 
       it('can get all tables', function(done) {

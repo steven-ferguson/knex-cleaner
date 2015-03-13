@@ -32,25 +32,27 @@ describe('knex_cleaner', function() {
           dbTestValues.knex.schema.createTable('test_2', function (table) {
             table.increments();
             table.string('name');
+            table.integer('test_1_id').unsigned().references('test_1.id');
             table.timestamps();
           })
         ]).then(function() {
           return Promise.all([
             dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
             dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
-            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
-            dbTestValues.knex('test_2').insert({name: Faker.company.companyName()}),
-            dbTestValues.knex('test_2').insert({name: Faker.company.companyName()}),
-            dbTestValues.knex('test_2').insert({name: Faker.company.companyName()})
-          ])
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()})
+          ]).then(function() {
+            return dbTestValues.knex('test_1').select().map(function(row) {
+              return dbTestValues.knex('test_2').insert({
+                name: Faker.company.companyName(),
+                test_1_id: row[0]
+              });
+            });
+          })
         });
       });
 
       afterEach(function() {
-        return Promise.all([
-          dbTestValues.knex.schema.dropTable('test_1'),
-          dbTestValues.knex.schema.dropTable('test_2')
-        ]);
+        return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
       });
 
       it('can clear all tables with defaults', function() {
