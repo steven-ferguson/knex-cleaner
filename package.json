@@ -1,24 +1,41 @@
 {
   "name": "knex-cleaner",
-  "version": "0.0.1",
-  "description": "Database cleaner for Knex.js",
-  "main": "index.js",
+  "version": "1.0.0",
+  "description": "Database cleaner for Knex.js and bookshelf.js",
+  "main": "./lib/knex_cleaner.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "./node_modules/mocha/bin/mocha"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/steven-ferguson/knex-cleaner.git"
   },
   "keywords": [
-    "knex"
+    "knex",
+    "knexjs",
+    "bookshelf",
+    "bookselfjs"
   ],
   "author": "Steven Ferguson <steven.ferguson11@gmail.com>",
   "license": "MIT",
   "bugs": {
     "url": "https://github.com/steven-ferguson/knex-cleaner/issues"
   },
+  "contributors": [
+    "JT Turner (https://github.com/jtwebman)"
+  ],
   "dependencies": {
-    "bluebird": "^2.9.13"
+    "bluebird": "^2.9.13",
+    "lodash": "^3.5.0"
+  },
+  "devDependencies": {
+    "chai": "*",
+    "chai-as-promised": "^4.3.0",
+    "faker": "^2.1.2",
+    "knex": "^0.7.5",
+    "mocha": "*",
+    "mysql": "^2.5.5",
+    "pg": "^4.3.0",
+    "sqlite3": "^3.0.5"
   }
 }
