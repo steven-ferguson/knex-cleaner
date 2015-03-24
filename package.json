@@ -1,6 +1,6 @@
 {
   "name": "knex-cleaner",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Database cleaner for Knex.js and bookshelf.js",
   "main": "./lib/knex_cleaner.js",
   "scripts": {
