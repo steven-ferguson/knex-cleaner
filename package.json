@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "chai": "*",
-    "chai-as-BPromised": "^4.3.0",
+    "chai-as-promised": "^4.3.0",
     "faker": "^2.1.2",
     "knex": "^0.7.5",
     "mocha": "*",
