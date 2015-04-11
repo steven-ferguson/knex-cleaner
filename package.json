@@ -1,6 +1,6 @@
 {
   "name": "knex-cleaner",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Database cleaner for Knex.js and bookshelf.js",
   "main": "./lib/knex_cleaner.js",
   "scripts": {
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "chai": "*",
-    "chai-as-promised": "^4.3.0",
+    "chai-as-BPromised": "^4.3.0",
     "faker": "^2.1.2",
     "knex": "^0.7.5",
     "mocha": "*",
