@@ -1,6 +1,6 @@
 'use strict';
 
-var Promise = require('bluebird');
+var BPromise = require('bluebird');
 var chai = require("chai");
 var chaiAsPromised = require("chai-as-promised");
 
@@ -21,7 +21,7 @@ describe('knex_tables', function() {
     describe(dbTestValues.client, function() {
 
       beforeEach(function() {
-        return Promise.all([
+        return BPromise.all([
           dbTestValues.knex.schema.createTable('test_1', function (table) {
             table.increments();
             table.string('name');
@@ -32,29 +32,39 @@ describe('knex_tables', function() {
             table.string('name');
             table.timestamps();
           })
-        ]);
+        ]).then(function() {
+          return dbTestValues.knex
+          .raw('CREATE VIEW test_view AS SELECT * FROM test_1')
+        });
       });
 
       afterEach(function() {
-        return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
+        return dbTestValues.knex.raw('DROP VIEW test_view').then(function() {
+          return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
+        });
       });
 
-      it('can get all tables', function(done) {
+      it('can get all tables', function() {
         return knexTables.getTableNames(dbTestValues.knex)
         .then(function(tables) {
           tables.should.include('test_1');
           tables.should.include('test_2');
-          done();
         });
       });
 
-      it('can get all tables filtering by ignoreTables option', function(done) {
+      it('can get all tables filtering by ignoreTables option', function() {
         return knexTables.getTableNames(dbTestValues.knex, {
             ignoreTables: ['test_1']
         }).then(function(tables) {
           tables.should.not.include('test_1');
           tables.should.include('test_2');
-          done();
+        });
+      });
+
+      it('views should not be in the list of tables', function() {
+        return knexTables.getTableNames(dbTestValues.knex)
+        .then(function(tables) {
+          tables.should.not.include('test_view');
         });
       });
 

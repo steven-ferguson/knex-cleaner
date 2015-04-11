@@ -1,6 +1,6 @@
 'use strict';
 
-var Promise = require('bluebird');
+var BPromise = require('bluebird');
 var Faker = require('faker');
 var chai = require("chai");
 var chaiAsPromised = require("chai-as-promised");
@@ -23,7 +23,7 @@ describe('knex_cleaner', function() {
     describe(dbTestValues.client, function() {
 
       beforeEach(function() {
-        return Promise.all([
+        return BPromise.all([
           dbTestValues.knex.schema.createTable('test_1', function (table) {
             table.increments();
             table.string('name');
@@ -36,7 +36,7 @@ describe('knex_cleaner', function() {
             table.timestamps();
           })
         ]).then(function() {
-          return Promise.all([
+          return BPromise.all([
             dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
             dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
             dbTestValues.knex('test_1').insert({name: Faker.company.companyName()})
@@ -58,7 +58,7 @@ describe('knex_cleaner', function() {
       it('can clear all tables with defaults', function() {
         return knexCleaner.clean(dbTestValues.knex)
         .then(function() {
-          return Promise.all([
+          return BPromise.all([
             knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
               .should.eventually.equal(0),
             knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
@@ -72,7 +72,7 @@ describe('knex_cleaner', function() {
           mode: 'delete'
         })
         .then(function() {
-          return Promise.all([
+          return BPromise.all([
             knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
             .should.eventually.equal(0),
             knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
@@ -86,7 +86,7 @@ describe('knex_cleaner', function() {
           ignoreTables: ['test_1']
         })
         .then(function() {
-          return Promise.all([
+          return BPromise.all([
             knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
             .should.eventually.equal(3),
             knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
