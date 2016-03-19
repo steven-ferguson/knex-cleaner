@@ -9,7 +9,7 @@ chai.use(chaiAsPromised);
 
 var knexMySQL = require('./knex_test')('mysql');
 var knexPG = require('./knex_test')('pg');
-var knexSqLite3 = require('./knex_test')('pg');
+var knexSqLite3 = require('./knex_test')('sqlite3');
 var knexTables = require('../lib/knex_tables');
 
 describe('knex_tables', function() {
