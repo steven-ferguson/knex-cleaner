@@ -29,8 +29,8 @@
     "lodash": "^3.5.0"
   },
   "devDependencies": {
-    "chai": "*",
-    "chai-as-promised": "^4.3.0",
+    "chai": "3.5.x",
+    "chai-as-promised": "5.3.x",
     "faker": "^2.1.2",
     "knex": "^0.7.5",
     "mocha": "*",

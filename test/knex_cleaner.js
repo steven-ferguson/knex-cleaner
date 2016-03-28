@@ -47,7 +47,7 @@ describe('knex_cleaner', function() {
                 test_1_id: row[0]
               });
             });
-          })
+          });
         });
       });
 
@@ -94,6 +94,42 @@ describe('knex_cleaner', function() {
           ]);
         });
       });
+
+      describe('camel cased table names', function() {
+        beforeEach(function() {
+          return dbTestValues.knex.schema.createTableIfNotExists('dogBreeds', function (table) {
+            table.increments();
+            table.string('name');
+            table.timestamps();
+          }).then(function() {
+            return dbTestValues.knex('dogBreeds').insert({
+              name: 'corgi'
+            });
+          });
+        });
+
+        afterEach(function() {
+          return knexTables.getDropTables(dbTestValues.knex, ['dogBreeds']);
+        });
+
+        it('clears the table with defaults', function() {
+          return knexCleaner.clean(dbTestValues.knex)
+            .then(function() {
+              return knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds')
+                .should.eventually.equal(0);
+            });
+        });
+
+        it('clears the table with delete', function() {
+          return knexCleaner.clean(dbTestValues.knex, {
+            mode: 'delete'
+          }).then(function() {
+            return knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds')
+              .should.eventually.equal(0);
+          });
+        });
+      });
+
 
     });
 
