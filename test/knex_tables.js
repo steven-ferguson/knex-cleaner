@@ -34,7 +34,7 @@ describe('knex_tables', function() {
           })
         ]).then(function() {
           return dbTestValues.knex
-          .raw('CREATE VIEW test_view AS SELECT * FROM test_1')
+          .raw('CREATE VIEW test_view AS SELECT * FROM test_1');
         });
       });
 
@@ -42,6 +42,10 @@ describe('knex_tables', function() {
         return dbTestValues.knex.raw('DROP VIEW test_view').then(function() {
           return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
         });
+      });
+
+      after(function () {
+        return dbTestValues.knex.destroy();
       });
 
       it('can get all tables', function() {

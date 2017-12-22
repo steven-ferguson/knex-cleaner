@@ -5,13 +5,15 @@
       "host": "127.0.0.1",
       "user": "knex_cleaner",
       "password": "password",
-      "database": "knex_cleaner_test"
+      "database": "knex_cleaner_test",
+      "port": "8081"
     }
   },
   "pg": {
     "client": "pg",
     "connection": {
       "host": "127.0.0.1",
+      "port": "8082",
       "user": "knex_cleaner",
       "password": "password",
       "database": "knex_cleaner_test"

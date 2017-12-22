@@ -7,4 +7,4 @@ var testSettings = process.env.KNEX_CLEANER_TEST
 
 module.exports = function(client) {
   return knex(testSettings[client]);
-}
+};
