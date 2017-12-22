@@ -6,6 +6,7 @@
     "it": false,
     "should": false,
     "beforeEach": false,
-    "afterEach": false
+    "afterEach": false,
+    "after": false
   }
 }

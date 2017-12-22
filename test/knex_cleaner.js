@@ -10,18 +10,19 @@ chai.use(chaiAsPromised);
 
 var knexMySQL = require('./knex_test')('mysql');
 var knexPG = require('./knex_test')('pg');
-var knexSqLite3 = require('./knex_test')('pg');
+var knexSqLite3 = require('./knex_test')('sqlite3');
 var knexCleaner = require('../lib/knex_cleaner');
 var knexTables = require('../lib/knex_tables');
 
 describe('knex_cleaner', function() {
+  const clients = [
+    { client: 'mysql', knex: knexMySQL },
+    { client: 'postgres', knex: knexPG },
+    { client: 'sqllite', knex: knexSqLite3 },
+  ];
 
-  [{ client: 'mysql', knex: knexMySQL }, { client: 'postgresql', knex: knexPG },
-  { client: 'sqlite3', knex: knexSqLite3}]
-  .forEach(function(dbTestValues) {
-
+  clients.forEach(function(dbTestValues) {
     describe(dbTestValues.client, function() {
-
       beforeEach(function() {
         return BPromise.all([
           dbTestValues.knex.schema.createTable('test_1', function (table) {
@@ -53,6 +54,10 @@ describe('knex_cleaner', function() {
 
       afterEach(function() {
         return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
+      });
+
+      after(function () {
+        return dbTestValues.knex.destroy();
       });
 
       it('can clear all tables with defaults', function() {
@@ -129,10 +134,6 @@ describe('knex_cleaner', function() {
           });
         });
       });
-
-
     });
-
   });
-
 });

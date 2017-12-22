@@ -8,8 +8,7 @@
 
 ### The Easy Way
 
-By default, Knex-Cleaner runs tests against MySQL, Postgres, and SQLite. The easiest way to run the tests is by creating the database using the SQL scripts
-in the setup folder.
+By default, Knex-Cleaner runs tests against MySQL, Postgres, and SQLite. The easiest way to run the tests is by creating the database using Docker. Just run `docker-compose up -d` from the project root.
 
 ### The Hard Way
 
@@ -18,6 +17,9 @@ You need to setup a MySQL and Postgres database with this user having full acces
 * Database: knex_cleaner_test
 * User: knex_cleaner
 * Password: password
+* Port:
+    MYSQL: 8081
+    POSTGRES: 8082
 
 No setup is required for SQLite.
 
