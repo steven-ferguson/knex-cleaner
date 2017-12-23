@@ -1,11 +1,12 @@
 version: 2
 jobs:
   build:
+    working_directory: ~/knex-cleaner
     docker:
       - image: circleci/node:8
         environment:
           MYSQL_PORT: 3306
-          PG_PORT: 5433
+          PG_PORT: 5432
       - image: circleci/mysql:8
         environment:
           MYSQL_USER: knex_cleaner
@@ -13,6 +14,7 @@ jobs:
           MYSQL_DATABASE: knex_cleaner_test
           MYSQL_RANDOM_ROOT_PASSWORD: 1
       - image: circleci/postgres:9
+        environment:
           POSTGRES_DB: knex_cleaner_test
           POSTGRES_USER: knex_cleaner
           POSTGRES_PASSWORD: password
@@ -28,6 +30,11 @@ jobs:
           key: dependency-cache-{{ checksum "package-lock.json" }}
           paths:
             - ./node_modules
+      - run:
+          name: Wait for dbs
+          command: |
+            dockerize -wait tcp://localhost:3306 -timeout 1m
+            dockerize -wait tcp://localhost:5432 -timeout 1m
       - run:
           name: test
           command: npm test
