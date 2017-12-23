@@ -1,0 +1,25 @@
+{
+  "mysql": {
+    "connection": {
+      "host": "MYSQL_HOST",
+      "user": "MYSQL_USER",
+      "password": "MYSQL_PASSWORD",
+      "database": "MYSQL_DB",
+      "port": "MYSQL_PORT"
+    }
+  },
+  "pg": {
+    "connection": {
+      "host": "PG_HOST",
+      "port": "PG_PORT",
+      "user": "PG_USER",
+      "password": "PG_PASSWORD",
+      "database": "PG_DB"
+    }
+  },
+  "sqlite3": {
+    "connection": {
+      "filename": "SQLITE_FILE"
+    }
+  }
+}
