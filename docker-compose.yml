@@ -1,7 +1,7 @@
 version: "3"
 services:
   mysql:
-    image: "mysql:latest"
+    image: "mysql:8"
     ports:
       - "8081:3306"
     environment:
@@ -10,7 +10,7 @@ services:
       MYSQL_DATABASE: knex_cleaner_test
       MYSQL_RANDOM_ROOT_PASSWORD: 1
   postgres:
-    image: "postgres:latest"
+    image: "postgres:9"
     ports:
       - "8082:5432"
     environment:

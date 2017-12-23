@@ -1,18 +1,18 @@
-'use strict';
+const BPromise = require('bluebird');
+const Faker = require('faker');
+const chai = require("chai");
+const chaiAsPromised = require("chai-as-promised");
+const config = require('config');
+const knex = require('knex');
+const knexCleaner = require('../lib/knex_cleaner');
+const knexTables = require('../lib/knex_tables');
 
-var BPromise = require('bluebird');
-var Faker = require('faker');
-var chai = require("chai");
-var chaiAsPromised = require("chai-as-promised");
+const knexMySQL = knex(config.get('mysql'));
+const knexPG = knex(config.get('pg'));
+const knexSqLite3 = knex(config.get('sqlite3'));
 
 chai.should();
 chai.use(chaiAsPromised);
-
-var knexMySQL = require('./knex_test')('mysql');
-var knexPG = require('./knex_test')('pg');
-var knexSqLite3 = require('./knex_test')('sqlite3');
-var knexCleaner = require('../lib/knex_cleaner');
-var knexTables = require('../lib/knex_tables');
 
 describe('knex_cleaner', function() {
   const clients = [
