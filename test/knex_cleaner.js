@@ -3,14 +3,15 @@ const Faker = require('faker');
 const chai = require("chai");
 const chaiAsPromised = require("chai-as-promised");
 const config = require('config');
-const knex = require('knex');
+const knexLib = require('knex');
 const knexCleaner = require('../lib/knex_cleaner');
 const knexTables = require('../lib/knex_tables');
 
-const knexMySQL = knex(config.get('mysql'));
-const knexPG = knex(config.get('pg'));
-const knexSqLite3 = knex(config.get('sqlite3'));
+const knexMySQL = knexLib(config.get('mysql'));
+const knexPG = knexLib(config.get('pg'));
+const knexSqLite3 = knexLib(config.get('sqlite3'));
 
+const { expect } = chai;
 chai.should();
 chai.use(chaiAsPromised);
 
@@ -22,115 +23,135 @@ describe('knex_cleaner', function() {
   ];
 
   clients.forEach(function(dbTestValues) {
-    describe(dbTestValues.client, function() {
-      beforeEach(function() {
-        return BPromise.all([
-          dbTestValues.knex.schema.createTable('test_1', function (table) {
-            table.increments();
-            table.string('name');
-            table.timestamps();
-          }),
-          dbTestValues.knex.schema.createTable('test_2', function (table) {
-            table.increments();
-            table.string('name');
-            table.integer('test_1_id').unsigned().references('test_1.id');
-            table.timestamps();
-          })
-        ]).then(function() {
-          return BPromise.all([
-            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
-            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
-            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()})
-          ]).then(function() {
-            return dbTestValues.knex('test_1').select().map(function(row) {
-              return dbTestValues.knex('test_2').insert({
-                name: Faker.company.companyName(),
-                test_1_id: row[0]
-              });
-            });
-          });
-        });
-      });
+    const { knex, client } = dbTestValues;
 
-      afterEach(function() {
-        return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
+    describe(dbTestValues.client, function() {
+      beforeEach('start with empty db', async function () {
+        const tableNames = await knexTables.getTableNames(knex);
+
+        return Promise.all(
+          tableNames.map(tableName => {
+            if (tableName !== 'sqlite_sequence' || client !== 'sqllite') {
+              return knex.schema.dropTable(tableName);
+            }
+          })
+        );
       });
 
       after(function () {
         return dbTestValues.knex.destroy();
       });
 
-      it('can clear all tables with defaults', function() {
-        return knexCleaner.clean(dbTestValues.knex)
-        .then(function() {
-          return BPromise.all([
-            knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
-              .should.eventually.equal(0),
-            knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
-              .should.eventually.equal(0)
-          ]);
-        });
+      it('handles a database with no tables', function () {
+        return knexCleaner.clean(knex);
       });
 
-      it('can clear all tables with delete', function() {
-        return knexCleaner.clean(dbTestValues.knex, {
-          mode: 'delete'
-        })
-        .then(function() {
-          return BPromise.all([
-            knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
-            .should.eventually.equal(0),
-            knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
-            .should.eventually.equal(0)
-          ]);
-        });
-      });
-
-      it('can clear all tables ignoring tables', function() {
-        return knexCleaner.clean(dbTestValues.knex, {
-          ignoreTables: ['test_1']
-        })
-        .then(function() {
-          return BPromise.all([
-            knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
-            .should.eventually.equal(3),
-            knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
-            .should.eventually.equal(0)
-          ]);
-        });
-      });
-
-      describe('camel cased table names', function() {
+      describe('basic tests', function () {
         beforeEach(function() {
-          return dbTestValues.knex.schema.createTableIfNotExists('dogBreeds', function (table) {
-            table.increments();
-            table.string('name');
-            table.timestamps();
-          }).then(function() {
-            return dbTestValues.knex('dogBreeds').insert({
-              name: 'corgi'
+          return BPromise.all([
+            dbTestValues.knex.schema.createTable('test_1', function (table) {
+              table.increments();
+              table.string('name');
+              table.timestamps();
+            }),
+            dbTestValues.knex.schema.createTable('test_2', function (table) {
+              table.increments();
+              table.string('name');
+              table.integer('test_1_id').unsigned().references('test_1.id');
+              table.timestamps();
+            })
+          ]).then(function() {
+            return BPromise.all([
+              dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+              dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+              dbTestValues.knex('test_1').insert({name: Faker.company.companyName()})
+            ]).then(function() {
+              return dbTestValues.knex('test_1').select().map(function(row) {
+                return dbTestValues.knex('test_2').insert({
+                  name: Faker.company.companyName(),
+                  test_1_id: row[0]
+                });
+              });
             });
           });
         });
 
         afterEach(function() {
-          return knexTables.getDropTables(dbTestValues.knex, ['dogBreeds']);
+          return knexTables.getDropTables(dbTestValues.knex, ['test_1', 'test_2']);
         });
 
-        it('clears the table with defaults', function() {
+        it('can clear all tables with defaults', function() {
           return knexCleaner.clean(dbTestValues.knex)
-            .then(function() {
+          .then(function() {
+            return BPromise.all([
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+                .should.eventually.equal(0),
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+                .should.eventually.equal(0)
+            ]);
+          });
+        });
+
+        it('can clear all tables with delete', function() {
+          return knexCleaner.clean(dbTestValues.knex, {
+            mode: 'delete'
+          })
+          .then(function() {
+            return BPromise.all([
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+              .should.eventually.equal(0),
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+              .should.eventually.equal(0)
+            ]);
+          });
+        });
+
+        it('can clear all tables ignoring tables', function() {
+          return knexCleaner.clean(dbTestValues.knex, {
+            ignoreTables: ['test_1']
+          })
+          .then(function() {
+            return BPromise.all([
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+              .should.eventually.equal(3),
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+              .should.eventually.equal(0)
+            ]);
+          });
+        });
+
+        describe('camel cased table names', function() {
+          beforeEach(function() {
+            return dbTestValues.knex.schema.createTableIfNotExists('dogBreeds', function (table) {
+              table.increments();
+              table.string('name');
+              table.timestamps();
+            }).then(function() {
+              return dbTestValues.knex('dogBreeds').insert({
+                name: 'corgi'
+              });
+            });
+          });
+
+          afterEach(function() {
+            return knexTables.getDropTables(dbTestValues.knex, ['dogBreeds']);
+          });
+
+          it('clears the table with defaults', function() {
+            return knexCleaner.clean(dbTestValues.knex)
+              .then(function() {
+                return knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds')
+                  .should.eventually.equal(0);
+              });
+          });
+
+          it('clears the table with delete', function() {
+            return knexCleaner.clean(dbTestValues.knex, {
+              mode: 'delete'
+            }).then(function() {
               return knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds')
                 .should.eventually.equal(0);
             });
-        });
-
-        it('clears the table with delete', function() {
-          return knexCleaner.clean(dbTestValues.knex, {
-            mode: 'delete'
-          }).then(function() {
-            return knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds')
-              .should.eventually.equal(0);
           });
         });
       });
