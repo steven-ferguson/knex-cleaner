@@ -38,7 +38,8 @@ knexCleaner.clean(bookshelf.knex).then(function() {
 
 var options = {
   mode: 'delete', // Valid options 'truncate', 'delete'
-  ignoreTables: ['Dont_Del_1', 'Dont_Del_2']
+  ignoreTables: ['Dont_Del_1', 'Dont_Del_2'],
+  restartIdentity: true, // Used to tell PostgresSQL to reset the ID counter
 }
 
 knexCleaner.clean(knex, options).then(function() {
