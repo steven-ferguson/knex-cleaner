@@ -23,6 +23,7 @@
     "client": "sqlite3",
     "connection": {
       "filename": "./knex_clean_test.sqlite"
-    }
+    },
+    "useNullAsDefault": true
   }
 }
