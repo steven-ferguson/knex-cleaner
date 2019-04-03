@@ -145,6 +145,46 @@ describe('knex_cleaner', function() {
               });
           });
 
+          if (client === 'postgres') {
+            it('clears the table with truncate and restarts identity disabled', async function() {
+              await dbTestValues.knex('dogBreeds').insert({ name: 'Zbruchle' });
+              await knexCleaner.clean(dbTestValues.knex, {
+                mode: 'truncate',
+                restartIdentity: false
+              });
+              const res = parseInt(await knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds'), 10);
+              res.should.equal(0);
+
+              const sequenceVal = parseInt((await dbTestValues.knex.schema.raw(`SELECT last_value FROM "dogBreeds_id_seq";`)).rows[0].last_value, 10);
+              sequenceVal.should.equal(2);
+            });
+
+            it('clears the table with truncate and restarts identity enabled', async function() {
+              await dbTestValues.knex('dogBreeds').insert({ name: 'Zbruchle' });
+              await knexCleaner.clean(dbTestValues.knex, {
+                mode: 'truncate',
+                restartIdentity: true
+              });
+              const res = parseInt(await knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds'), 10);
+              res.should.equal(0);
+
+              const sequenceVal = parseInt((await dbTestValues.knex.schema.raw(`SELECT last_value FROM "dogBreeds_id_seq";`)).rows[0].last_value, 10);
+              sequenceVal.should.equal(1);
+            });
+
+            it('clears the table with truncate and default restarts identity', async function() {
+              await dbTestValues.knex('dogBreeds').insert({ name: 'Zbruchle' });
+              await knexCleaner.clean(dbTestValues.knex, {
+                mode: 'truncate',
+              });
+              const res = parseInt(await knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds'), 10);
+              res.should.equal(0);
+
+              const sequenceVal = parseInt((await dbTestValues.knex.schema.raw(`SELECT last_value FROM "dogBreeds_id_seq";`)).rows[0].last_value, 10);
+              sequenceVal.should.equal(1);
+            });
+          }
+
           it('clears the table with delete', function() {
             return knexCleaner.clean(dbTestValues.knex, {
               mode: 'delete'
