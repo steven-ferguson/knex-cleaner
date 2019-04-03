@@ -4,7 +4,8 @@
   "description": "Database cleaner for Knex.js and bookshelf.js",
   "main": "./lib/knex_cleaner.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha"
+    "test": "./node_modules/mocha/bin/mocha",
+    "jshint": "jshint ./"
   },
   "repository": {
     "type": "git",
@@ -33,6 +34,7 @@
     "chai-as-promised": "5.3.x",
     "config": "^1.28.1",
     "faker": "^2.1.2",
+    "jshint": "^2.10.2",
     "knex": "^0.16.3",
     "mocha": "*",
     "mysql": "^2.16.0",
