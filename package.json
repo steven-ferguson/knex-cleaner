@@ -5,7 +5,9 @@
   "main": "./lib/knex_cleaner.js",
   "scripts": {
     "test": "./node_modules/mocha/bin/mocha",
-    "jshint": "jshint ./"
+    "jshint": "jshint ./",
+    "infra": "docker-compose up -d --force-recreate",
+    "infra:stop": "docker-compose stop"
   },
   "repository": {
     "type": "git",

@@ -9,6 +9,8 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: knex_cleaner_test
       MYSQL_RANDOM_ROOT_PASSWORD: 1
+    volumes:
+      - ./.db/mysql/init:/docker-entrypoint-initdb.d
   postgres:
     image: "postgres:9"
     ports:
