@@ -9,6 +9,7 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_DATABASE: knex_cleaner_test
       MYSQL_RANDOM_ROOT_PASSWORD: 1
+    command: --default-authentication-plugin=mysql_native_password
   postgres:
     image: "postgres:9"
     ports:
