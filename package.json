@@ -4,7 +4,7 @@
   "description": "Database cleaner for Knex.js and bookshelf.js",
   "main": "./lib/knex_cleaner.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha"
+    "test": "./node_modules/mocha/bin/mocha --timeout 60000"
   },
   "repository": {
     "type": "git",
@@ -26,17 +26,17 @@
   ],
   "dependencies": {
     "bluebird": "^2.9.13",
-    "lodash": "^3.5.0"
+    "lodash": "^4.17.11"
   },
   "devDependencies": {
     "chai": "3.5.x",
     "chai-as-promised": "5.3.x",
     "config": "^1.28.1",
     "faker": "^2.1.2",
-    "knex": "^0.7.5",
+    "knex": "^0.17.3",
     "mocha": "*",
     "mysql": "^2.5.5",
     "pg": "^4.3.0",
-    "sqlite3": "3.1.x"
+    "sqlite3": "^4.0.8"
   }
 }
