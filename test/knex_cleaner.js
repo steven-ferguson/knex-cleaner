@@ -47,31 +47,31 @@ describe('knex_cleaner', function() {
       });
 
       describe('basic tests', function () {
-        beforeEach(function() {
-          return BPromise.all([
-            dbTestValues.knex.schema.createTable('test_1', function (table) {
-              table.increments();
-              table.string('name');
-              table.timestamps();
-            }),
-            dbTestValues.knex.schema.createTable('test_2', function (table) {
-              table.increments();
-              table.string('name');
-              table.integer('test_1_id').unsigned().references('test_1.id');
-              table.timestamps();
-            })
-          ]).then(function() {
-            return BPromise.all([
-              dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
-              dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
-              dbTestValues.knex('test_1').insert({name: Faker.company.companyName()})
-            ]).then(function() {
-              return dbTestValues.knex('test_1').select().map(function(row) {
-                return dbTestValues.knex('test_2').insert({
-                  name: Faker.company.companyName(),
-                  test_1_id: row[0]
-                });
-              });
+        beforeEach(async function() {
+
+          await dbTestValues.knex.schema.createTable('test_1', function (table) {
+            table.increments();
+            table.string('name');
+            table.timestamps();
+          });
+
+          await dbTestValues.knex.schema.createTable('test_2', function (table) {
+            table.increments();
+            table.string('name');
+            table.integer('test_1_id').unsigned().references('test_1.id');
+            table.timestamps();
+          });
+
+          await BPromise.all([
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()}),
+            dbTestValues.knex('test_1').insert({name: Faker.company.companyName()})
+          ]);
+
+          await dbTestValues.knex('test_1').select().map(function(row) {
+            return dbTestValues.knex('test_2').insert({
+              name: Faker.company.companyName(),
+              test_1_id: row[0]
             });
           });
         });
@@ -122,7 +122,7 @@ describe('knex_cleaner', function() {
 
         describe('camel cased table names', function() {
           beforeEach(function() {
-            return dbTestValues.knex.schema.createTableIfNotExists('dogBreeds', function (table) {
+            return dbTestValues.knex.schema.createTable('dogBreeds', function (table) {
               table.increments();
               table.string('name');
               table.timestamps();
@@ -144,6 +144,46 @@ describe('knex_cleaner', function() {
                   .should.eventually.equal(0);
               });
           });
+
+          if (client === 'postgres') {
+            it('clears the table with truncate and restarts identity disabled', async function() {
+              await dbTestValues.knex('dogBreeds').insert({ name: 'Zbruchle' });
+              await knexCleaner.clean(dbTestValues.knex, {
+                mode: 'truncate',
+                restartIdentity: false
+              });
+              const res = parseInt(await knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds'), 10);
+              res.should.equal(0);
+
+              const sequenceVal = parseInt((await dbTestValues.knex.schema.raw(`SELECT last_value FROM "dogBreeds_id_seq";`)).rows[0].last_value, 10);
+              sequenceVal.should.equal(2);
+            });
+
+            it('clears the table with truncate and restarts identity enabled', async function() {
+              await dbTestValues.knex('dogBreeds').insert({ name: 'Zbruchle' });
+              await knexCleaner.clean(dbTestValues.knex, {
+                mode: 'truncate',
+                restartIdentity: true
+              });
+              const res = parseInt(await knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds'), 10);
+              res.should.equal(0);
+
+              const sequenceVal = parseInt((await dbTestValues.knex.schema.raw(`SELECT last_value FROM "dogBreeds_id_seq";`)).rows[0].last_value, 10);
+              sequenceVal.should.equal(1);
+            });
+
+            it('clears the table with truncate and default restarts identity', async function() {
+              await dbTestValues.knex('dogBreeds').insert({ name: 'Zbruchle' });
+              await knexCleaner.clean(dbTestValues.knex, {
+                mode: 'truncate',
+              });
+              const res = parseInt(await knexTables.getTableRowCount(dbTestValues.knex, 'dogBreeds'), 10);
+              res.should.equal(0);
+
+              const sequenceVal = parseInt((await dbTestValues.knex.schema.raw(`SELECT last_value FROM "dogBreeds_id_seq";`)).rows[0].last_value, 10);
+              sequenceVal.should.equal(1);
+            });
+          }
 
           it('clears the table with delete', function() {
             return knexCleaner.clean(dbTestValues.knex, {
