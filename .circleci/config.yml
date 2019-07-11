@@ -13,6 +13,7 @@ jobs:
           MYSQL_PASSWORD: password
           MYSQL_DATABASE: knex_cleaner_test
           MYSQL_RANDOM_ROOT_PASSWORD: 1
+        command: --default-authentication-plugin=mysql_native_password
       - image: circleci/postgres:9
         environment:
           POSTGRES_DB: knex_cleaner_test
