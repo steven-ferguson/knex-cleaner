@@ -120,6 +120,35 @@ describe('knex_cleaner', function() {
           });
         });
 
+        if (client === 'postgres') {
+          it('can clear all tables with non public schema', async function() {
+            await dbTestValues.knex.raw(`
+              DROP SCHEMA IF EXISTS test CASCADE;
+              CREATE SCHEMA test;
+              ALTER TABLE test_1 SET SCHEMA test;
+              ALTER TABLE test_2 SET SCHEMA test;
+            `);
+
+            dbTestValues.knex.client.searchPath = 'test';
+            await knexCleaner.clean(dbTestValues.knex);
+
+            await BPromise.all([
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_1')
+              .should.eventually.equal(0),
+              knexTables.getTableRowCount(dbTestValues.knex, 'test_2')
+              .should.eventually.equal(0)
+            ]);
+
+            await dbTestValues.knex.raw(`
+              ALTER TABLE "test"."test_1" SET SCHEMA public;
+              ALTER TABLE "test"."test_2" SET SCHEMA public;
+              DROP SCHEMA test CASCADE;
+            `);
+
+            delete dbTestValues.knex.client.searchPath;
+          });
+        }
+
         describe('camel cased table names', function() {
           beforeEach(function() {
             return dbTestValues.knex.schema.createTable('dogBreeds', function (table) {
