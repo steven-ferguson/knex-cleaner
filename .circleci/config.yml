@@ -1,6 +1,6 @@
 version: 2
 jobs:
-  build:
+  test:
     working_directory: ~/knex-cleaner
     docker:
       - image: circleci/node:8
@@ -39,3 +39,8 @@ jobs:
       - run:
           name: test
           command: npm test
+workflows:
+  version: 2
+  test:
+    jobs:
+      - test
