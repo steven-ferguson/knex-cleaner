@@ -32,7 +32,7 @@
   "devDependencies": {
     "chai": "3.5.x",
     "chai-as-promised": "5.3.x",
-    "config": "^1.28.1",
+    "config": "^3.3.8",
     "faker": "^2.1.2",
     "knex": "^0.19.5",
     "mocha": "6.x",
